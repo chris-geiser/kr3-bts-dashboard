@@ -344,7 +344,35 @@ body {
 }
 .confetti svg {
   position: absolute;
-  opacity: 0.13;
+  top: 0;
+  opacity: 0.18;
+  will-change: transform;
+}
+
+@keyframes confetti-drift {
+  0%   { transform: translate3d(0, -12vh, 0) rotate(0deg); }
+  25%  { transform: translate3d(var(--sway, 20px), 22vh, 0) rotate(120deg); }
+  50%  { transform: translate3d(0, 52vh, 0) rotate(240deg); }
+  75%  { transform: translate3d(calc(var(--sway, 20px) * -1), 82vh, 0) rotate(360deg); }
+  100% { transform: translate3d(0, 112vh, 0) rotate(480deg); }
+}
+
+@keyframes burst-piece {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30%  { transform: translate(calc(var(--dx, 0px) * 0.55), calc(var(--dy, 0px) * 0.45 - 60px)) rotate(calc(var(--rot, 360deg) * 0.4)); opacity: 1; }
+  100% { transform: translate(var(--dx, 0px), calc(var(--dy, 0px) + 240px)) rotate(var(--rot, 360deg)); opacity: 0; }
+}
+
+.burst-piece {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti svg { animation: none !important; }
+  .burst-piece { display: none !important; }
 }
 
 /* Main and banner above confetti */
@@ -656,6 +684,7 @@ function renderThermometer(items, goal) {
       ? '🏆 Goal exceeded! +' + formatNum(bonus) + ' hrs/week bonus'
       : '🏆 Goal reached!';
     celebration.hidden = false;
+    setTimeout(() => fireConfettiBurst(celebration, 80), 900);
   } else {
     celebration.hidden = true;
   }
@@ -764,33 +793,78 @@ function sortItems(items) {
   });
 }
 
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function makeConfettiShape(color) {
+  const r = Math.random();
+  if (r > 0.66) return `<circle cx="12" cy="12" r="9" fill="${color}"/>`;
+  if (r > 0.33) return `<path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z" fill="${color}"/>`;
+  return `<circle cx="12" cy="12" r="9" fill="none" stroke="${color}" stroke-width="2" stroke-dasharray="3 3"/>`;
+}
+
 function renderConfetti() {
   const container = document.getElementById('confetti');
   const colors = ['#ED017F', '#FFC854', '#39C2D7', '#9A98CB'];
-  const count = 22;
+  const reduced = prefersReducedMotion();
+  const count = 26;
   for (let i = 0; i < count; i++) {
     const c = colors[i % colors.length];
     const size = 10 + Math.random() * 18;
     const left = Math.random() * 100;
-    const top = 8 + Math.random() * 88;
     const svgNS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('width', size);
     svg.setAttribute('height', size);
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.style.left = left + '%';
-    svg.style.top = top + '%';
-    const r = Math.random();
-    let inner;
-    if (r > 0.66) {
-      inner = `<circle cx="12" cy="12" r="9" fill="${c}"/>`;
-    } else if (r > 0.33) {
-      inner = `<path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z" fill="${c}"/>`;
+    svg.innerHTML = makeConfettiShape(c);
+    if (!reduced) {
+      const duration = 10 + Math.random() * 12;
+      const delay = -Math.random() * duration;
+      const sway = (Math.random() * 40 - 20).toFixed(1) + 'px';
+      svg.style.setProperty('--sway', sway);
+      svg.style.animation = `confetti-drift ${duration.toFixed(2)}s linear infinite`;
+      svg.style.animationDelay = `${delay.toFixed(2)}s`;
     } else {
-      inner = `<circle cx="12" cy="12" r="9" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="3 3"/>`;
+      svg.style.top = (8 + Math.random() * 88) + '%';
     }
-    svg.innerHTML = inner;
     container.appendChild(svg);
+  }
+}
+
+function fireConfettiBurst(originElement, count = 70) {
+  if (prefersReducedMotion()) return;
+  if (!originElement) return;
+  const rect = originElement.getBoundingClientRect();
+  const originX = rect.left + rect.width / 2;
+  const originY = rect.top + rect.height / 2;
+  const colors = ['#ED017F', '#FFC854', '#39C2D7', '#9A98CB', '#514F9C'];
+  const svgNS = 'http://www.w3.org/2000/svg';
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const velocity = 180 + Math.random() * 320;
+    const dx = Math.cos(angle) * velocity;
+    const dy = Math.sin(angle) * velocity;
+    const rot = (Math.random() * 720 - 360);
+    const size = 8 + Math.random() * 12;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const duration = 1.6 + Math.random() * 0.8;
+    const piece = document.createElementNS(svgNS, 'svg');
+    piece.setAttribute('class', 'burst-piece');
+    piece.setAttribute('width', size);
+    piece.setAttribute('height', size);
+    piece.setAttribute('viewBox', '0 0 24 24');
+    piece.style.left = (originX - size / 2) + 'px';
+    piece.style.top = (originY - size / 2) + 'px';
+    piece.style.setProperty('--dx', dx.toFixed(1) + 'px');
+    piece.style.setProperty('--dy', dy.toFixed(1) + 'px');
+    piece.style.setProperty('--rot', rot.toFixed(0) + 'deg');
+    piece.style.animation = `burst-piece ${duration.toFixed(2)}s cubic-bezier(0.2, 0.7, 0.4, 1) forwards`;
+    piece.innerHTML = makeConfettiShape(color);
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), Math.ceil(duration * 1000) + 100);
   }
 }
 
