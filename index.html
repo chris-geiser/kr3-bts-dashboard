@@ -381,12 +381,31 @@ body {
 /* Empty / error */
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
-  color: var(--grey-mid);
-  font-size: 1.05rem;
+  padding: 3.5rem 2rem;
+  color: var(--grey-base);
   grid-column: 1 / -1;
-  background: var(--purple-bg);
-  border-radius: 14px;
+  background: linear-gradient(135deg, var(--purple-bg), var(--pink-bg));
+  border-radius: 16px;
+  border: 2px dashed var(--purple-light);
+}
+.empty-state-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  display: block;
+  margin-bottom: 1rem;
+}
+.empty-state-headline {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--purple-base);
+  margin-bottom: 0.5rem;
+}
+.empty-state-body {
+  font-size: 1rem;
+  color: var(--grey-base);
+  max-width: 32rem;
+  margin: 0 auto;
+  line-height: 1.55;
 }
 .error-banner {
   background: var(--yellow-bg);
@@ -725,7 +744,11 @@ function renderCards(items) {
   if (items.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
-    empty.textContent = 'Big things are coming. We are working on BTS improvements that will save the team thousands of hours. Check back soon. 🚀';
+    empty.innerHTML = `
+      <span class="empty-state-emoji" aria-hidden="true">🚀</span>
+      <h3 class="empty-state-headline">Big things are coming</h3>
+      <p class="empty-state-body">We are working on BTS improvements that will save the team thousands of hours each week. The first wins land here as they ship. Check back soon.</p>
+    `;
     grid.appendChild(empty);
     return;
   }
