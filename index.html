@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KR3 Back-to-School Ops</title>
+<meta name="description" content="Ignite Reading KR3 Back-to-School Ops dashboard. Tracking hours saved per week toward the SY 26-27 goal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink-base: #ED017F;
+  --pink-light: #F18DC1;
+  --pink-lighter: #F3CBE0;
+  --pink-bg: #FDF5F5;
+
+  --yellow-base: #FFC854;
+  --yellow-light: #FAD078;
+  --yellow-lighter: #FCE7C8;
+  --yellow-bg: #FFFAEE;
+
+  --blue-base: #39C2D7;
+  --blue-light: #72CDDF;
+  --blue-lighter: #C7E9F0;
+  --blue-bg: #F2F9FC;
+
+  --purple-base: #27004B;
+  --purple-mid: #514F9C;
+  --purple-light: #9A98CB;
+  --purple-bg: #F7F4FA;
+
+  --grey-base: #3D3C3C;
+  --grey-mid: #999999;
+  --grey-light: #EAEAEA;
+  --white: #FFFFFF;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-weight: 400;
+  color: var(--grey-base);
+  background: var(--white);
+  line-height: 1.5;
+  min-height: 100vh;
+  position: relative;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--purple-base);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  z-index: 100;
+  text-decoration: none;
+  font-weight: 500;
+}
+.skip-link:focus { left: 0.5rem; top: 0.5rem; }
+
+/* Banner */
+.banner {
+  background: var(--purple-base);
+  color: var(--white);
+  padding: 3rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.banner h1 {
+  font-weight: 900;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+}
+.banner p {
+  margin-top: 0.75rem;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-weight: 400;
+  opacity: 0.92;
+  max-width: 50rem;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
+}
+.banner-sparkle {
+  position: absolute;
+  opacity: 0.65;
+  z-index: 0;
+}
+.banner-sparkle.s1 { top: 1rem; left: 5%; }
+.banner-sparkle.s2 { bottom: 0.8rem; right: 6%; }
+.banner-sparkle.s3 { top: 55%; right: 14%; }
+.banner-sparkle.s4 { bottom: 1rem; left: 12%; }
+.banner-sparkle.s5 { top: 30%; left: 18%; }
+
+/* Layout */
+.main {
+  display: grid;
+  grid-template-columns: minmax(240px, 28%) 1fr;
+  gap: 2.5rem;
+  padding: 2.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Thermometer column */
+.thermometer-col {
+  position: relative;
+  border-right: 1px solid var(--grey-light);
+  padding-right: 2rem;
+  text-align: center;
+}
+.section-heading {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 1.25rem;
+  color: var(--purple-base);
+  text-align: center;
+}
+
+.thermo-total-wrap {
+  display: block;
+  padding: 0.25rem 0;
+}
+.thermo-num {
+  font-weight: 900;
+  font-size: 2.75rem;
+  color: var(--purple-base);
+  line-height: 1;
+  display: block;
+}
+.thermo-unit {
+  font-size: 0.9rem;
+  color: var(--grey-mid);
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.thermo-bar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+.thermo-label-top, .thermo-label-bottom {
+  font-size: 0.85rem;
+  color: var(--grey-mid);
+  font-weight: 500;
+}
+.thermo-label-top { order: 1; }
+.thermo-bar { order: 2; }
+.thermo-label-bottom { order: 3; }
+
+.thermo-bar {
+  position: relative;
+  width: 60px;
+  height: 340px;
+  background: var(--grey-light);
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+}
+.thermo-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, var(--pink-base), var(--yellow-base));
+  border-radius: 30px;
+  height: 0;
+  transition: height 1.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Cards column */
+.cards-col {
+  min-width: 0;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+/* Flip cards */
+.card {
+  perspective: 1200px;
+  min-height: 290px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 14px;
+}
+.card:focus { outline: none; }
+.card:focus-visible .card-inner {
+  box-shadow: 0 0 0 3px var(--purple-mid), 0 4px 18px rgba(39, 0, 75, 0.1);
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 290px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  border-radius: 14px;
+}
+.card.flipped .card-inner { transform: rotateY(180deg); }
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 2.5rem 1.5rem 1.25rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 18px rgba(39, 0, 75, 0.1);
+  overflow: hidden;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+  background: var(--white);
+  color: var(--grey-base);
+}
+
+/* Color rotation */
+.card[data-color="pink"] .card-front { background: var(--pink-base); color: var(--white); }
+.card[data-color="blue"] .card-front { background: var(--blue-base); color: var(--white); }
+.card[data-color="yellow"] .card-front { background: var(--yellow-base); color: var(--grey-base); }
+.card[data-color="purple"] .card-front { background: var(--purple-mid); color: var(--white); }
+
+.card[data-color="pink"] .card-back { background: var(--pink-bg); }
+.card[data-color="blue"] .card-back { background: var(--blue-bg); }
+.card[data-color="yellow"] .card-back { background: var(--yellow-bg); }
+.card[data-color="purple"] .card-back { background: var(--purple-bg); }
+
+.card-flip-hint {
+  position: absolute;
+  top: 0.85rem;
+  right: 1rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+.card-release-date {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.card-title {
+  font-weight: 700;
+  font-size: 1.3rem;
+  flex: 1;
+  line-height: 1.25;
+  padding-right: 1rem;
+  margin-top: 0;
+}
+.card-stats {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+.stat-chip {
+  background: rgba(255, 255, 255, 0.22);
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1;
+}
+.card[data-color="yellow"] .stat-chip {
+  background: rgba(61, 60, 60, 0.12);
+}
+
+.card-back-flip {
+  position: absolute;
+  top: 0.85rem;
+  right: 1rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--purple-mid);
+}
+.card-back-body {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 0.25rem;
+  margin-top: 0.5rem;
+}
+.card-back-thanks {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--purple-base);
+  padding-top: 0.9rem;
+  margin-top: 0.9rem;
+  border-top: 1px solid rgba(39, 0, 75, 0.12);
+}
+
+/* Confetti background */
+.confetti {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+}
+.confetti svg {
+  position: absolute;
+  opacity: 0.13;
+}
+
+/* Main and banner above confetti */
+.banner, .main, .footer { position: relative; z-index: 1; }
+
+/* Empty / error */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--grey-mid);
+  font-size: 1.05rem;
+  grid-column: 1 / -1;
+  background: var(--purple-bg);
+  border-radius: 14px;
+}
+.error-banner {
+  background: var(--yellow-bg);
+  border-left: 4px solid var(--yellow-base);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--grey-mid);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .card-inner, .thermo-fill { transition: none; }
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .main {
+    grid-template-columns: 1fr;
+    padding: 1.5rem 1rem;
+    gap: 1.75rem;
+  }
+  .thermometer-col {
+    border-right: none;
+    border-bottom: 1px solid var(--grey-light);
+    padding-right: 0;
+    padding-bottom: 1.5rem;
+  }
+  .thermo-bar {
+    width: 100%;
+    height: 36px;
+    border-radius: 18px;
+  }
+  .thermo-fill {
+    height: 100%;
+    width: 0;
+    top: 0;
+    bottom: auto;
+    background: linear-gradient(to right, var(--pink-base), var(--yellow-base));
+    transition: width 1.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    border-radius: 18px;
+  }
+  .thermo-bar-section { flex-direction: row; align-items: center; }
+  .thermo-label-top { order: 3; }
+  .thermo-label-bottom { order: 1; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .banner { padding: 2rem 1rem; }
+}
+</style>
+</head>
+<body>
+<a href="#cards-section" class="skip-link">Skip to content</a>
+
+<div class="confetti" aria-hidden="true" id="confetti"></div>
+
+<header class="banner" role="banner">
+  <svg class="banner-sparkle s1" width="36" height="36" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z" fill="#ED017F"/>
+  </svg>
+  <svg class="banner-sparkle s2" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z" fill="#FFC854"/>
+  </svg>
+  <svg class="banner-sparkle s3" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="5" fill="#39C2D7"/>
+  </svg>
+  <svg class="banner-sparkle s4" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="5" fill="#FFC854"/>
+  </svg>
+  <svg class="banner-sparkle s5" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="5" fill="#ED017F"/>
+  </svg>
+
+  <h1 id="banner-title">KR3 Back-to-School Ops</h1>
+  <p id="banner-subtitle">Resolve top BTS blockers, save 2,000 hrs/week for staff in SY 26-27.</p>
+</header>
+
+<main class="main">
+  <section class="thermometer-col" aria-labelledby="thermo-heading">
+    <h2 id="thermo-heading" class="section-heading">Hours Saved Per Week</h2>
+
+    <div class="thermo-total-wrap">
+      <span class="thermo-num" id="thermo-num">0</span>
+      <span class="thermo-unit">of <span id="thermo-goal">2,000</span> hrs/week</span>
+    </div>
+
+    <div class="thermo-bar-section">
+      <span class="thermo-label-top" id="thermo-top-label">2,000</span>
+      <div class="thermo-bar" role="progressbar" aria-labelledby="thermo-heading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="thermo-bar">
+        <div class="thermo-fill" id="thermo-fill"></div>
+      </div>
+      <span class="thermo-label-bottom">0</span>
+    </div>
+  </section>
+
+  <section class="cards-col" id="cards-section" aria-labelledby="cards-heading">
+    <h2 id="cards-heading" class="section-heading">🎉 Done &amp; Released 🎉</h2>
+    <div id="error-banner-slot"></div>
+    <div class="cards-grid" id="cards-grid" role="list"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span id="last-updated"></span>
+</footer>
+
+<script>
+// ============================================================
+// CONFIGURATION: Update these URLs after publishing your Google Sheet.
+// File > Share > Publish to web > select tab > CSV > Publish > copy URL.
+// While these are placeholders, the page renders SAMPLE_DATA below.
+// ============================================================
+const DONE_ITEMS_CSV_URL = 'YOUR_PUBLISHED_CSV_URL_FOR_DONE_ITEMS_TAB';
+const CONFIG_CSV_URL = 'YOUR_PUBLISHED_CSV_URL_FOR_CONFIG_TAB';
+// ============================================================
+
+const SAMPLE_DATA = {
+  config: {
+    "Goal": 2000,
+    "Banner Title": "KR3 Back-to-School Ops",
+    "Banner Subtitle": "Resolve top BTS blockers, save 2,000 hrs/week for staff in SY 26-27.",
+    "Sheet Last Updated": "2026-05-21"
+  },
+  items: [
+    {
+      "Summary": "Automated tutor schedule builder",
+      "Staff Summary": "Tutor schedules now generate automatically based on student needs and tutor availability. This eliminates hours of manual scheduling each week for School Champions.",
+      "H/W/P": 1.5,
+      "# Impacted": 200,
+      "H/W Saved": 300,
+      "Requested By": "Ops Team, School Champions",
+      "Team": "Product & Engineering",
+      "Date Completed": "2026-05-15"
+    },
+    {
+      "Summary": "One-click session rescheduling",
+      "Staff Summary": "When a session needs to move, staff can now reschedule with a single click instead of navigating multiple screens. Saves time and reduces scheduling errors.",
+      "H/W/P": 0.75,
+      "# Impacted": 350,
+      "H/W Saved": 262.5,
+      "Requested By": "Tutor Educators, Program Managers",
+      "Team": "Product & Engineering",
+      "Date Completed": "2026-05-10"
+    },
+    {
+      "Summary": "Bulk student roster import",
+      "Staff Summary": "School Champions can now upload an entire student roster from a spreadsheet instead of adding students one by one. A process that took hours now takes minutes.",
+      "H/W/P": 2.0,
+      "# Impacted": 150,
+      "H/W Saved": 300,
+      "Requested By": "District Champions, Implementation Team",
+      "Team": "Product & Engineering",
+      "Date Completed": "2026-05-01"
+    }
+  ]
+};
+
+const CARD_COLORS = ['pink', 'blue', 'yellow', 'purple'];
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c === '\r') { /* skip */ }
+      else { field += c; }
+    }
+  }
+  if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function csvToObjects(text) {
+  const rows = parseCSV(text).filter(r => r.some(c => c && c.trim()));
+  if (rows.length === 0) return [];
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (row[i] || '').trim());
+    return obj;
+  });
+}
+
+function csvToKeyValue(text) {
+  const rows = parseCSV(text).filter(r => r[0] && r[0].trim());
+  const obj = {};
+  rows.slice(1).forEach(r => {
+    if (r[0] && r[0].trim()) obj[r[0].trim()] = (r[1] || '').trim();
+  });
+  return obj;
+}
+
+function isPlaceholderURL(url) {
+  return !url || url.startsWith('YOUR_PUBLISHED');
+}
+
+async function fetchCSV(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+  return res.text();
+}
+
+function toNum(v) {
+  if (typeof v === 'number') return v;
+  if (v === null || v === undefined) return 0;
+  const n = parseFloat(String(v).replace(/,/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+function formatNum(n) {
+  return Math.round(n).toLocaleString('en-US');
+}
+
+function formatDecimal(n) {
+  if (Number.isInteger(n)) return n.toString();
+  return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+function formatReleaseDate(s) {
+  if (!s) return '';
+  const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return String(s);
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const monthIdx = parseInt(m[2], 10) - 1;
+  if (monthIdx < 0 || monthIdx > 11) return String(s);
+  return months[monthIdx] + ' ' + parseInt(m[3], 10) + ', ' + m[1];
+}
+
+function animateCounter(el, target, duration = 1800) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = formatNum(target);
+    return;
+  }
+  const start = performance.now();
+  function frame(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = formatNum(target * eased);
+    if (t < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function emojiFor(pct) {
+  if (pct >= 100) return '🏆';
+  if (pct >= 75) return '🎉';
+  if (pct >= 50) return '🔥';
+  return '';
+}
+
+function renderBanner(config) {
+  if (config['Banner Title']) document.getElementById('banner-title').textContent = config['Banner Title'];
+  if (config['Banner Subtitle']) document.getElementById('banner-subtitle').textContent = config['Banner Subtitle'];
+  if (config['Banner Title']) document.title = config['Banner Title'];
+  if (config['Sheet Last Updated']) {
+    document.getElementById('last-updated').textContent = 'Sheet last updated: ' + config['Sheet Last Updated'];
+  }
+}
+
+function renderThermometer(items, goal) {
+  const total = items.reduce((s, it) => s + toNum(it['H/W Saved']), 0);
+  const rawPct = goal > 0 ? (total / goal) * 100 : 0;
+  const pct = Math.min(100, rawPct);
+  document.getElementById('thermo-goal').textContent = formatNum(goal);
+  document.getElementById('thermo-top-label').textContent = formatNum(goal);
+  const bar = document.getElementById('thermo-bar');
+  bar.setAttribute('aria-valuenow', Math.round(pct));
+
+  const fill = document.getElementById('thermo-fill');
+  fill.dataset.pct = String(pct);
+  const applyFill = () => {
+    const isMobile = window.matchMedia('(max-width: 720px)').matches;
+    if (isMobile) {
+      fill.style.width = pct + '%';
+      fill.style.height = '';
+    } else {
+      fill.style.height = pct + '%';
+      fill.style.width = '';
+    }
+  };
+  setTimeout(applyFill, 120);
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(applyFill, 100);
+  });
+
+  animateCounter(document.getElementById('thermo-num'), total);
+}
+
+function escapeHTML(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function renderCards(items) {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  if (items.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'Big things are coming. We are working on BTS improvements that will save the team thousands of hours. Check back soon. 🚀';
+    grid.appendChild(empty);
+    return;
+  }
+  items.forEach((item, idx) => {
+    const color = CARD_COLORS[idx % CARD_COLORS.length];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('data-color', color);
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'listitem');
+    card.setAttribute('aria-pressed', 'false');
+    const summary = item['Summary'] || '';
+    card.setAttribute('aria-label', summary + '. Press Enter to see details.');
+    const hwp = toNum(item['H/W/P']);
+    const impacted = toNum(item['# Impacted']);
+    const saved = toNum(item['H/W Saved']);
+    const releaseDate = formatReleaseDate(item['Date Completed']);
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <span class="card-flip-hint" aria-hidden="true">tap to see details →</span>
+          ${releaseDate ? `<span class="card-release-date">Released ${escapeHTML(releaseDate)}</span>` : ''}
+          <div class="card-title">${escapeHTML(summary)}</div>
+          <div class="card-stats" aria-hidden="true">
+            <span class="stat-chip">⏱️ ${formatDecimal(hwp)} hrs/person</span>
+            <span class="stat-chip">👥 ${formatNum(impacted)} people</span>
+            <span class="stat-chip">💪 ${formatDecimal(saved)} hrs/week</span>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <span class="card-back-flip" aria-hidden="true">← flip back</span>
+          <div class="card-back-body">${escapeHTML(item['Staff Summary'] || '')}</div>
+          <div class="card-back-thanks">
+            Requested by ${escapeHTML(item['Requested By'] || 'the team')}. Completed by ${escapeHTML(item['Team'] || 'the team')}. Thank you! 🙏
+          </div>
+        </div>
+      </div>
+    `;
+    const toggle = () => {
+      const flipped = !card.classList.contains('flipped');
+      card.classList.toggle('flipped', flipped);
+      card.setAttribute('aria-pressed', String(flipped));
+    };
+    card.addEventListener('click', toggle);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+function showErrorBanner(msg) {
+  const el = document.getElementById('error-banner-slot');
+  el.innerHTML = `<div class="error-banner" role="alert">${escapeHTML(msg)}</div>`;
+}
+
+function sortItems(items) {
+  return [...items].sort((a, b) => {
+    const da = a['Date Completed'] || '';
+    const db = b['Date Completed'] || '';
+    return db.localeCompare(da);
+  });
+}
+
+function renderConfetti() {
+  const container = document.getElementById('confetti');
+  const colors = ['#ED017F', '#FFC854', '#39C2D7', '#9A98CB'];
+  const count = 22;
+  for (let i = 0; i < count; i++) {
+    const c = colors[i % colors.length];
+    const size = 10 + Math.random() * 18;
+    const left = Math.random() * 100;
+    const top = 8 + Math.random() * 88;
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', size);
+    svg.setAttribute('height', size);
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.style.left = left + '%';
+    svg.style.top = top + '%';
+    const r = Math.random();
+    let inner;
+    if (r > 0.66) {
+      inner = `<circle cx="12" cy="12" r="9" fill="${c}"/>`;
+    } else if (r > 0.33) {
+      inner = `<path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z" fill="${c}"/>`;
+    } else {
+      inner = `<circle cx="12" cy="12" r="9" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="3 3"/>`;
+    }
+    svg.innerHTML = inner;
+    container.appendChild(svg);
+  }
+}
+
+async function init() {
+  renderConfetti();
+  let items = [];
+  let config = {};
+  const usingPlaceholder = isPlaceholderURL(DONE_ITEMS_CSV_URL) || isPlaceholderURL(CONFIG_CSV_URL);
+  if (usingPlaceholder) {
+    items = SAMPLE_DATA.items;
+    config = SAMPLE_DATA.config;
+  } else {
+    try {
+      const [itemsCSV, configCSV] = await Promise.all([
+        fetchCSV(DONE_ITEMS_CSV_URL),
+        fetchCSV(CONFIG_CSV_URL)
+      ]);
+      items = csvToObjects(itemsCSV);
+      config = csvToKeyValue(configCSV);
+    } catch (e) {
+      showErrorBanner("Could not load data. Check that the Google Sheet is published and the URLs are correct. Showing sample data.");
+      items = SAMPLE_DATA.items;
+      config = SAMPLE_DATA.config;
+    }
+  }
+  renderBanner(config);
+  const goal = toNum(config['Goal']) || 2000;
+  renderThermometer(items, goal);
+  renderCards(sortItems(items));
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
