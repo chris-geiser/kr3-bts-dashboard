@@ -111,7 +111,9 @@ body {
 
 /* Thermometer column */
 .thermometer-col {
-  position: relative;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
   border-right: 1px solid var(--grey-light);
   padding-right: 2rem;
   text-align: center;
@@ -140,6 +142,27 @@ body {
   color: var(--grey-mid);
   display: block;
   margin-top: 0.25rem;
+}
+
+.thermo-celebration {
+  display: inline-block;
+  margin-top: 0.9rem;
+  padding: 0.5rem 0.95rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--pink-base), var(--yellow-base));
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(237, 1, 127, 0.25);
+  animation: celebration-pulse 2.4s ease-in-out infinite;
+}
+.thermo-celebration[hidden] { display: none; }
+@keyframes celebration-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 3px 10px rgba(237, 1, 127, 0.25); }
+  50% { transform: scale(1.04); box-shadow: 0 5px 16px rgba(237, 1, 127, 0.4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thermo-celebration { animation: none; }
 }
 
 .thermo-bar-section {
@@ -370,6 +393,7 @@ body {
     gap: 1.75rem;
   }
   .thermometer-col {
+    position: static;
     border-right: none;
     border-bottom: 1px solid var(--grey-light);
     padding-right: 0;
@@ -430,6 +454,7 @@ body {
     <div class="thermo-total-wrap">
       <span class="thermo-num" id="thermo-num">0</span>
       <span class="thermo-unit">of <span id="thermo-goal">2,000</span> hrs/week</span>
+      <span class="thermo-celebration" id="thermo-celebration" hidden></span>
     </div>
 
     <div class="thermo-bar-section">
@@ -624,6 +649,16 @@ function renderThermometer(items, goal) {
   const pct = Math.min(100, rawPct);
   document.getElementById('thermo-goal').textContent = formatNum(goal);
   document.getElementById('thermo-top-label').textContent = formatNum(goal);
+  const celebration = document.getElementById('thermo-celebration');
+  if (total >= goal && goal > 0) {
+    const bonus = total - goal;
+    celebration.textContent = bonus > 0
+      ? '🏆 Goal exceeded! +' + formatNum(bonus) + ' hrs/week bonus'
+      : '🏆 Goal reached!';
+    celebration.hidden = false;
+  } else {
+    celebration.hidden = true;
+  }
   const bar = document.getElementById('thermo-bar');
   bar.setAttribute('aria-valuenow', Math.round(pct));
 
