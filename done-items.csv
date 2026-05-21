@@ -1,0 +1,4 @@
+Summary,Staff Summary,H/W/P,# Impacted,H/W Saved,Requested By,Team,Date Completed
+Automated tutor schedule builder,"Tutor schedules now generate automatically based on student needs and tutor availability. This eliminates hours of manual scheduling each week for School Champions.",1.5,200,300,"Ops Team, School Champions",Product & Engineering,2026-05-15
+One-click session rescheduling,"When a session needs to move, staff can now reschedule with a single click instead of navigating multiple screens. Saves time and reduces scheduling errors.",0.75,350,262.5,"Tutor Educators, Program Managers",Product & Engineering,2026-05-10
+Bulk student roster import,"School Champions can now upload an entire student roster from a spreadsheet instead of adding students one by one. A process that took hours now takes minutes.",2,150,300,"District Champions, Implementation Team",Product & Engineering,2026-05-01
