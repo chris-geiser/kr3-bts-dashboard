@@ -1,0 +1,9 @@
+branch-defaults:
+  main:
+    environment: kr3-bts-dashboard-prod
+global:
+  application_name: kr3-bts-dashboard
+  default_region: us-east-1
+  platform_name: Docker running on 64bit Amazon Linux 2023
+  platform_version: null
+  workspace_type: Application
