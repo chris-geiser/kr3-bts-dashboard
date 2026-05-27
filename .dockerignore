@@ -1,0 +1,6 @@
+.git
+.github
+.ebextensions
+.elasticbeanstalk
+*.md
+.DS_Store
